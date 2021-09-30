@@ -32,7 +32,7 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
             df.dropna(axis=0, how='any', subset=[i for i in df.columns if i != 'functional_groups'], inplace=True)
             savename += '_keepfg'
         if save:
-            df.to_csv(savename + '.csv')
+            df.to_csv(savename + '.csv', index=False)
     
     if 'mean' in method:
         # use mean for corrupted data
@@ -47,7 +47,7 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
         if not remove_func_group_NAN:
             savename += '_keepfg'
         if save:
-            df.to_csv(savename + '.csv')
+            df.to_csv(savename + '.csv', index=False)
         
     if 'median' in method:
         # use median for corrupted data
@@ -62,6 +62,6 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
         if not remove_func_group_NAN:
             savename += '_keepfg'
         if save:
-            df.to_csv(savename + '.csv')
+            df.to_csv(savename + '.csv', index=False)
             
     # TODO add more method
