@@ -33,6 +33,7 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
             savename += '_keepfg'
         if save:
             df.to_csv(savename + '.csv', index=False)
+            print(savename + '.csv is saved')
     
     if 'mean' in method:
         # use mean for corrupted data
@@ -48,6 +49,7 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
             savename += '_keepfg'
         if save:
             df.to_csv(savename + '.csv', index=False)
+            print(savename + '.csv is saved')
         
     if 'median' in method:
         # use median for corrupted data
@@ -63,5 +65,20 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
             savename += '_keepfg'
         if save:
             df.to_csv(savename + '.csv', index=False)
-            
+            print(savename + '.csv is saved')
+    
+    if 'nan' in method:
+        # just replace corrupted data with nan
+        # remove func_group will not affect this function
+        df = df_ori.copy()
+        df.replace(0, np.nan, inplace=True)
+        df.replace(-1, np.nan, inplace=True)
+        df.replace(math.inf, np.nan, inplace=True)
+        savename = filename[:-4] + '_nan'
+        if save:
+            df.to_csv(savename + '.csv', index=False)
+            print(savename + '.csv is saved')
+
     # TODO add more method
+
+clean(method=['nan'])
