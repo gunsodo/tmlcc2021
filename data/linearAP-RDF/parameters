@@ -1,0 +1,5 @@
+linearly increased bin size for AP-RDF
+smooth = -10
+normalized factor = 1/n_atoms
+113 bins from 2 to 30 A for [electronegativity, hardness, vdWaalsVolume]
+-> steps = 0.004425
