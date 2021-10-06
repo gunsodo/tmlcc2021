@@ -1,3 +1,5 @@
+import pymatgen
+
 # Original source code: octadist
 def number_to_symbol(x):
     """
@@ -77,7 +79,7 @@ def get_coord_cif(f):
 
     # works only with pymatgen <= v2021.3.3
     structure = pymatgen.Structure.from_file(f)
-    atom = list(map(lambda x: elements.number_to_symbol(x), structure.atomic_numbers))
+    atom = list(map(lambda x: number_to_symbol(x), structure.atomic_numbers))
     coord = structure.cart_coords
 
     return atom, coord
