@@ -15,4 +15,7 @@ python main.py -r [rep1] [rep2] ... [repn] -m [model_name] -d results --grid_sea
 
 # Example
 python main.py -r preprocessed linearAP-RDF -m rf -d results --grid_search
+
+# Example (Prediction)
+python main.py -r preprocessed linearAP-RDF -m rf -d results --mode test
 ```

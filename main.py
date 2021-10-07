@@ -50,6 +50,8 @@ def main(args):
         loaded_model = joblib.load(filename)
 
         df, X_test = reps
+        df = df.rename(columns={"MOFname": "id"})
+        df["id"] = df["id"].apply(lambda x: x[9:])
         print("Predicting...")
         y_pred = loaded_model.predict(X_test)
     

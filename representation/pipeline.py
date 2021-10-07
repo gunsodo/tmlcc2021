@@ -24,7 +24,7 @@ def load_representation(rep_list, mode="train"):
         return X_train, X_test, y_train, y_test
     
     elif mode in ["pretest", "test"]:
-        df_merged.sort_values(by=['MOFname'], ).reset_index(drop=True)
+        df_merged.sort_values(by=['MOFname']).reset_index(drop=True)
         return df_merged.iloc[:, :1], df_merged.iloc[:, 1:]
 
     else:
