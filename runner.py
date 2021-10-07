@@ -12,7 +12,7 @@ import numpy as np
 MODELS = {
     'svr': SVR(),
     'rf': RandomForestRegressor(),
-    'gpr': GaussianProcessRegressor(),
+    'gpr': GaussianProcessRegressor(copy_X_train=False),
     'nn': MLPRegressor(),
 }
 

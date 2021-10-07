@@ -10,6 +10,7 @@ def load_representation(rep_list, mode="train"):
 
     for rep in rep_list:
         _df = pd.read_csv(f"data/{rep}/{mode}.csv", index_col=False)
+        _df['MOFname'] = _df['MOFname'].apply(lambda x: x[:-4] if ".cif" in x else x)
         dfs.append(_df)
 
     df_merged = reduce(lambda  left,right: pd.merge(left, right, on='MOFname', how='inner'), dfs)
