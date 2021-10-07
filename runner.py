@@ -1,5 +1,5 @@
 from sklearn.svm import SVR
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import *
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV
@@ -14,6 +14,10 @@ MODELS = {
     'rf': RandomForestRegressor(),
     'gpr': GaussianProcessRegressor(copy_X_train=False),
     'nn': MLPRegressor(),
+    'gbr': GradientBoostingRegressor(),
+    'ada': AdaBoostRegressor(),
+    'bag': BaggingRegressor(),
+    'exr': ExtraTreesRegressor(),
 }
 
 TUNED_PARAMS = {
@@ -39,11 +43,17 @@ TUNED_PARAMS = {
             "solver": ["lbfgs", "sgd", "adam"], 
             "alpha": [0.00005, 0.0005]
         },
+    'gbr': {
+            'learning_rate': [0.01, 0.05, 0.1],
+            'subsample': [1, 0.5, 0.1],
+            'n_estimators': [100, 200, 500],
+            'max_depth': [3, 6]
+        },
 }
 
 def train(X, y, model_name, grid_search, save_dir):
     if grid_search:
-        clf = GridSearchCV(MODELS[model_name], TUNED_PARAMS[model_name], verbose=10, cv=3)
+        clf = GridSearchCV(MODELS[model_name], TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
         print("Training the model...")
         clf.fit(X, y)
 
