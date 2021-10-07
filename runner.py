@@ -12,10 +12,10 @@ import numpy as np
 MODELS = {
     'svr': SVR(verbose=2),
     'rf': RandomForestRegressor(verbose=2),
-    'gpr': GaussianProcessRegressor(verbose=2, copy_X_train=False),
+    'gpr': GaussianProcessRegressor(copy_X_train=False),
     'nn': MLPRegressor(verbose=2),
     'gbr': GradientBoostingRegressor(verbose=2),
-    'ada': AdaBoostRegressor(verbose=2),
+    'ada': AdaBoostRegressor(),
     'bag': BaggingRegressor(verbose=2),
     'exr': ExtraTreesRegressor(verbose=2),
 }
