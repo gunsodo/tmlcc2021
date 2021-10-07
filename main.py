@@ -1,6 +1,7 @@
 import argparse
 import joblib
 import os
+import pandas as pd
 
 from representation.pipeline import load_representation
 from runner import train, predict
@@ -40,19 +41,26 @@ def print_settings(args):
 def main(args):
     print_settings(args)
     reps = load_representation(args.reps, args.mode)
+    filename = args.directory + "/" + "_".join(sorted(args.reps)) + "_" + args.model + ".sav"
+
+    if not os.path.exists(args.directory):
+            os.makedirs(args.directory)
 
     if args.mode != "train":
-        # TODO
-        pass
+        loaded_model = joblib.load(filename)
+
+        df, X_test = reps
+        print("Predicting...")
+        y_pred = loaded_model.predict(X_test)
+    
+        df['CO2_working_capacity [mL/g]'] = y_pred
+        filename = filename[:-4] + ".csv"
+        df.to_csv(filename, sep=',', index=False)
+        
     else:
         X_train, X_test, y_train, y_test = reps
         model = train(X_train, y_train, args.model, args.grid_search, args.directory)
         lmae = predict(X_test, y_test, model, args.grid_search)
-        
-        if not os.path.exists(args.directory):
-            os.makedirs(args.directory)
-            
-        filename = args.directory + "/" + "_".join(sorted(args.reps)) + "_" + args.model + ".sav"
         joblib.dump(model, filename)
 
 if __name__ == "__main__":

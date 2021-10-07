@@ -1,7 +1,6 @@
 results/
 data/
-# data/coordinates/train.csv
-# data/linearAP-RDF/train.csv
+main.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
