@@ -9,6 +9,17 @@ from sklearn.gaussian_process.kernels import RBF, DotProduct
 from math import log10
 import numpy as np
 
+MODELS_GS = {
+    'svr': SVR(),
+    'rf': RandomForestRegressor(),
+    'gpr': GaussianProcessRegressor(copy_X_train=False),
+    'nn': MLPRegressor(),
+    'gbr': GradientBoostingRegressor(),
+    'ada': AdaBoostRegressor(),
+    'bag': BaggingRegressor(),
+    'exr': ExtraTreesRegressor(),
+}
+
 MODELS = {
     'svr': SVR(verbose=2),
     'rf': RandomForestRegressor(verbose=2),
@@ -45,8 +56,8 @@ TUNED_PARAMS = {
     'gbr': {
         'learning_rate': [0.01, 0.05, 0.1],
         'subsample': [1, 0.5],
-        'n_estimators': [200, 500],
-        'max_depth': [3, 6, None]
+        'n_estimators': [500, 1000],
+        'max_depth': [6, None]
     },
     'exr': {
         'n_estimators': [100, 200, 500],
@@ -56,7 +67,7 @@ TUNED_PARAMS = {
 
 def train(X, y, model_name, grid_search, save_dir):
     if grid_search:
-        clf = GridSearchCV(MODELS[model_name], TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
+        clf = GridSearchCV(MODELS_GS[model_name], TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
         print("Training the model...")
         clf.fit(X, y)
 
