@@ -10,14 +10,14 @@ from math import log10
 import numpy as np
 
 MODELS = {
-    'svr': SVR(),
-    'rf': RandomForestRegressor(),
-    'gpr': GaussianProcessRegressor(copy_X_train=False),
-    'nn': MLPRegressor(),
-    'gbr': GradientBoostingRegressor(),
-    'ada': AdaBoostRegressor(),
-    'bag': BaggingRegressor(),
-    'exr': ExtraTreesRegressor(),
+    'svr': SVR(verbose=2),
+    'rf': RandomForestRegressor(verbose=2),
+    'gpr': GaussianProcessRegressor(verbose=2, copy_X_train=False),
+    'nn': MLPRegressor(verbose=2),
+    'gbr': GradientBoostingRegressor(verbose=2),
+    'ada': AdaBoostRegressor(verbose=2),
+    'bag': BaggingRegressor(verbose=2),
+    'exr': ExtraTreesRegressor(verbose=2),
 }
 
 TUNED_PARAMS = {
@@ -25,8 +25,7 @@ TUNED_PARAMS = {
             'C': [1e-2, 0.1, 1, 10, 100, 1000]},
             {'kernel': ['linear'], 'C': [1e-2, 0.1, 1, 10, 100, 1000]}],
     'rf': {
-        'n_estimators': [100, 200, 500, 1000],
-        'max_features': ['auto', 'sqrt'],
+        'n_estimators': [100, 200, 500],
         'min_samples_split': [2, 10],
         'min_samples_leaf': [1, 2, 4],
     },
@@ -38,17 +37,21 @@ TUNED_PARAMS = {
             "kernel": [DotProduct(sigma_0) for sigma_0 in np.logspace(-1, 1, 2)]
         }],
     'nn': {
-            "hidden_layer_sizes": [(1,), (50,)], 
-            "activation": ["identity", "logistic", "tanh", "relu"], 
-            "solver": ["lbfgs", "sgd", "adam"], 
-            "alpha": [0.00005, 0.0005]
-        },
+        "hidden_layer_sizes": [(1,), (50,)], 
+        "activation": ["identity", "logistic", "tanh", "relu"], 
+        "solver": ["lbfgs", "sgd", "adam"], 
+        "alpha": [0.00005, 0.0005]
+    },
     'gbr': {
-            'learning_rate': [0.01, 0.05, 0.1],
-            'subsample': [1, 0.5, 0.1],
-            'n_estimators': [100, 200, 500],
-            'max_depth': [3, 6]
-        },
+        'learning_rate': [0.01, 0.05, 0.1],
+        'subsample': [1, 0.5],
+        'n_estimators': [200, 500],
+        'max_depth': [3, 6, None]
+    },
+    'exr': {
+        'n_estimators': [100, 200, 500],
+        'max_depth': [3, 6, None]
+    },
 }
 
 def train(X, y, model_name, grid_search, save_dir):
