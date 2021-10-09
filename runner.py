@@ -3,6 +3,7 @@ from sklearn.ensemble import *
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neural_network import MLPRegressor
 from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import mean_absolute_error
@@ -20,6 +21,7 @@ MODELS_GS = {
     'bag': BaggingRegressor(),
     'exr': ExtraTreesRegressor(),
     'xgb': XGBRegressor(),
+    'lgb': LGBMRegressor(),
 }
 
 MODELS = {
@@ -31,7 +33,8 @@ MODELS = {
     'ada': AdaBoostRegressor(),
     'bag': BaggingRegressor(verbose=2),
     'exr': ExtraTreesRegressor(verbose=2),
-    'xgb': XGBRegressor(verbose=2),
+    'xgb': XGBRegressor(verbosity=2),
+    'lgb': LGBMRegressor(verbose=2),
 }
 
 TUNED_PARAMS = {
