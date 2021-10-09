@@ -78,8 +78,38 @@ def get_coord_cif(f):
     warnings.filterwarnings('ignore')
 
     # works only with pymatgen <= v2021.3.3
-    structure = pymatgen.Structure.from_file(f)
-    atom = list(map(lambda x: number_to_symbol(x), structure.atomic_numbers))
-    coord = structure.cart_coords
-
+    try:
+        structure = pymatgen.Structure.from_file(f)
+        atom = list(map(lambda x: number_to_symbol(x), structure.atomic_numbers))
+        coord = structure.cart_coords
+    except:
+        coord = []
+        atom = []
+        file = open(f, 'r')
+        state = 0
+        for line in file.readlines():
+            if len(line) == 1:
+                state += 1
+                continue
+            if state == 1:
+                s = line.split(' ')
+                s = [x for x in s if x]
+                if len(s) == 7:
+                    atom.extend([s[1]])
+                    coord.append([float(x) for x in s[3:6]])
+            elif state > 1:
+                break
+            else:
+                continue
+        print(atom, coord)
     return atom, coord
+    
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser("Coordinate Extractor")
+    parser.add_argument('-p', '--path', type=str, required=True)
+
+    args = parser.parse_args()
+
+    atom, coord = get_coord_cif(args.path)
