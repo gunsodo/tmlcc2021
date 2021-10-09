@@ -4,6 +4,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neural_network import MLPRegressor
 from xgboost import XGBRegressor
 from lightgbm import LGBMRegressor
+from catboost import CatBoostRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import mean_absolute_error
@@ -22,6 +23,7 @@ MODELS_GS = {
     'exr': ExtraTreesRegressor(),
     'xgb': XGBRegressor(),
     'lgb': LGBMRegressor(),
+    'cat': CatBoostRegressor(),
 }
 
 MODELS = {
@@ -35,6 +37,7 @@ MODELS = {
     'exr': ExtraTreesRegressor(verbose=2),
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
+    'cat': CatBoostRegressor(verbose=2),
 }
 
 TUNED_PARAMS = {
