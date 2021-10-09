@@ -2,6 +2,7 @@ from sklearn.svm import SVR
 from sklearn.ensemble import *
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neural_network import MLPRegressor
+from xgboost import XGBRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import mean_absolute_error
@@ -18,6 +19,7 @@ MODELS_GS = {
     'ada': AdaBoostRegressor(),
     'bag': BaggingRegressor(),
     'exr': ExtraTreesRegressor(),
+    'xgb': XGBRegressor(),
 }
 
 MODELS = {
@@ -29,6 +31,7 @@ MODELS = {
     'ada': AdaBoostRegressor(),
     'bag': BaggingRegressor(verbose=2),
     'exr': ExtraTreesRegressor(verbose=2),
+    'xgb': XGBRegressor(verbose=2),
 }
 
 TUNED_PARAMS = {
@@ -63,6 +66,18 @@ TUNED_PARAMS = {
         'n_estimators': [100, 200, 500],
         'max_depth': [3, 6, None]
     },
+    'xgb': {
+        # "objective": "reg:squarederror",
+        "n_estimators": [100],
+        "max_depth": [4, 12],
+        "learning_rate": [0.01, 0.05, 0.1],
+        # "colsample_bytree": trial.suggest_loguniform("colsample_bytree", 0.2, 0.6),
+        "subsample": [1, 0.5],
+        "alpha": [0.01, 0.1, 1, 10],
+        # "lambda": trial.suggest_loguniform("lambda", 1e-8, 10.0),
+        # "gamma": trial.suggest_loguniform("gamma", 1e-8, 10.0),
+        # "min_child_weight": trial.suggest_loguniform("min_child_weight", 10, 1000),
+    }
 }
 
 def train(X, y, model_name, grid_search, save_dir):
@@ -83,6 +98,11 @@ def train(X, y, model_name, grid_search, save_dir):
     else:
         model = MODELS[model_name]
         print("Training the model...")
+
+        if model_name == "gpr":
+            X = X.iloc[:5000, :]
+            y = y[:5000]
+
         model.fit(X, y)
         return model
 
