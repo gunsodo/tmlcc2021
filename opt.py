@@ -7,7 +7,7 @@ import optuna
 from representation.pipeline import load_representation
 from runner import train, predict, objective
 
-parser = argparse.ArgumentParser("Experimental Test Run")
+parser = argparse.ArgumentParser("Experimental Test Run (Optuna)")
 
 parser.add_argument('-r', '--reps', nargs='+', default=["preprocessed"])
 parser.add_argument('-m', '--model', type=str, default="svr")
@@ -69,7 +69,6 @@ def main(args):
         print('Number of finished trials:', len(study.trials))
         print('Best trial:', study.best_trial.params)
 
-        print("Training model with the best parameter...")
         model = train(X_train, y_train, args.model, save_dir=args.directory, param=study.best_trial.params, grid_search=False)
         lmae = predict(X_test, y_test, model)
         joblib.dump(model, filename)

@@ -143,6 +143,7 @@ def train(X, y, model_name, grid_search, save_dir, param=None):
     else:
         if param:
             model = MODELS_GS[model_name](**param)
+            print("Training model with the best parameter...")
         else:
             model = MODELS[model_name]
             print("Training the model...")
