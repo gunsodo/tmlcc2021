@@ -142,6 +142,8 @@ def train(X, y, model_name, grid_search, save_dir, param=None):
 
     else:
         if param:
+            param["n_estimators"] = 1000
+            param["grow_policy"] = 'Depthwise'
             model = MODELS_GS[model_name](**param)
             print("Training model with the best parameter...")
         else:
