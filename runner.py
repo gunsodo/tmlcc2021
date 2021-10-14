@@ -84,12 +84,12 @@ TUNED_PARAMS = {
     }
 }
 
-def objective(trial, X, y, model_name, n_splits=3, n_repeats=1, n_jobs=2, early_stopping_rounds=10):
+def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_stopping_rounds=10):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
     params = {
         "objective": "MAE",
         "n_estimators": 1000, 
-        "depth": trial.suggest_int("max_depth", 2, 16),
+        "depth": trial.suggest_int("max_depth", 8, 16),
         "learning_rate": trial.suggest_loguniform("learning_rate", 0.005, 0.01),
         "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.5, 5),
         "min_child_samples": trial.suggest_loguniform("min_child_samples", 1, 32),
