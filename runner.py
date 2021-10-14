@@ -12,6 +12,8 @@ from sklearn.gaussian_process.kernels import RBF, DotProduct
 from math import log10
 import numpy as np
 
+from models.nn import NeuralNetwork
+
 MODELS_GS = {
     'svr': SVR(),
     'rf': RandomForestRegressor(),
@@ -38,6 +40,7 @@ MODELS = {
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
     'cat': CatBoostRegressor(verbose=2),
+    'nn': NeuralNetwork(),
 }
 
 TUNED_PARAMS = {

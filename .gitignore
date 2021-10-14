@@ -2,6 +2,7 @@ results/
 data/
 main.ipynb
 catboost_info/
+test_tf.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
