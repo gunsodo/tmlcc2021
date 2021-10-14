@@ -2,7 +2,7 @@ import pandas as pd
 from functools import reduce
 from sklearn.model_selection import train_test_split
 
-def load_representation(rep_list, mode="train"):
+def load_representation(rep_list, mode="train", convert_categorical=False):
     if len(rep_list) == 0:
         raise Exception("Error: the representation list is empty")
 
@@ -14,6 +14,9 @@ def load_representation(rep_list, mode="train"):
         dfs.append(_df)
 
     df_merged = reduce(lambda  left,right: pd.merge(left, right, on='MOFname', how='inner'), dfs)
+
+    # if convert_categorical:
+    #     df_merged = astype_categorical(df_merged)
     
     if mode == "train":
         gt_df = pd.read_csv("data/working_capacity/train.csv", index_col=False)
@@ -30,4 +33,20 @@ def load_representation(rep_list, mode="train"):
     else:
         raise KeyError("model should be one of the following choices: 'train', 'pretest', 'test'")
 
+def astype_categorical(df):
+    column_names = set(df.columns)
+    categorical_columns = [
+        "topology_num", 
+        "metal_element", 
+        "functional_group_1", 
+        "functional_group_2",
+        "organic_linker1",
+        "organic_linker2",
+    ]
+
+    for cat in categorical_columns:
+        if cat in column_names:
+            df[cat] = df[cat].astype('category')
+    
+    return df
     

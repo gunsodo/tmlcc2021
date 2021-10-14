@@ -40,7 +40,7 @@ MODELS = {
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
     'cat': CatBoostRegressor(verbose=2),
-    # 'nn': NeuralNetwork(),
+    'nn': NeuralNetwork(),
 }
 
 TUNED_PARAMS = {

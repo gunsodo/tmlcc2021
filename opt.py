@@ -41,7 +41,7 @@ def print_settings(args):
 
 def main(args):
     print_settings(args)
-    reps = load_representation(args.reps, args.mode)
+    reps = load_representation(args.reps, args.mode, convert_categorical=True)
     filename = args.directory + "/" + "_".join(["optuna"] + sorted(args.reps)) + "_" + args.model + ".sav"
 
     if not os.path.exists(args.directory):
