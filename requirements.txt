@@ -2,3 +2,4 @@ xgboost
 lightgbm
 catboost
 tensorflow
+optuna
