@@ -5,27 +5,27 @@ from sklearn.neural_network import MLPRegressor
 from xgboost import XGBRegressor
 from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV, train_test_split, RepeatedKFold
 from sklearn.metrics import mean_absolute_error
 from sklearn.gaussian_process.kernels import RBF, DotProduct
 from math import log10
 import numpy as np
+import optuna
 
-from models.nn import NeuralNetwork
+# from models.nn import NeuralNetwork
 
 MODELS_GS = {
-    'svr': SVR(),
-    'rf': RandomForestRegressor(),
-    'gpr': GaussianProcessRegressor(copy_X_train=False),
-    'mlp': MLPRegressor(),
-    'gbr': GradientBoostingRegressor(),
-    'ada': AdaBoostRegressor(),
-    'bag': BaggingRegressor(),
-    'exr': ExtraTreesRegressor(),
-    'xgb': XGBRegressor(),
-    'lgb': LGBMRegressor(),
-    'cat': CatBoostRegressor(),
+    'svr': SVR,
+    'rf': RandomForestRegressor,
+    'gpr': GaussianProcessRegressor,
+    'mlp': MLPRegressor,
+    'gbr': GradientBoostingRegressor,
+    'ada': AdaBoostRegressor,
+    'bag': BaggingRegressor,
+    'exr': ExtraTreesRegressor,
+    'xgb': XGBRegressor,
+    'lgb': LGBMRegressor,
+    'cat': CatBoostRegressor,
 }
 
 MODELS = {
@@ -40,7 +40,7 @@ MODELS = {
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
     'cat': CatBoostRegressor(verbose=2),
-    'nn': NeuralNetwork(),
+    # 'nn': NeuralNetwork(),
 }
 
 TUNED_PARAMS = {
@@ -76,22 +76,58 @@ TUNED_PARAMS = {
         'max_depth': [3, 6, None]
     },
     'xgb': {
-        # "objective": "reg:squarederror",
         "n_estimators": [100],
         "max_depth": [4, 12],
         "learning_rate": [0.01, 0.05, 0.1],
-        # "colsample_bytree": trial.suggest_loguniform("colsample_bytree", 0.2, 0.6),
         "subsample": [1, 0.5],
         "alpha": [0.01, 0.1, 1, 10],
-        # "lambda": trial.suggest_loguniform("lambda", 1e-8, 10.0),
-        # "gamma": trial.suggest_loguniform("gamma", 1e-8, 10.0),
-        # "min_child_weight": trial.suggest_loguniform("min_child_weight", 10, 1000),
     }
 }
 
-def train(X, y, model_name, grid_search, save_dir):
+def objective(trial, X, y, model_name, n_splits=3, n_repeats=1, n_jobs=2, early_stopping_rounds=10):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    params = {
+        "objective": "MAE",
+        "n_estimators": 1000, 
+        "depth": trial.suggest_int("max_depth", 2, 16),
+        "learning_rate": trial.suggest_loguniform("learning_rate", 0.005, 0.01),
+        "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.5, 5),
+        "min_child_samples": trial.suggest_loguniform("min_child_samples", 1, 32),
+        "grow_policy": 'Depthwise',
+        "use_best_model": True,
+        "eval_metric": "MAE",
+        "od_type": 'iter',
+        "od_wait": 20,
+    }
+
+    model = MODELS_GS[model_name](**params)
+
+    # model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=0, early_stopping_rounds=100)
+
+    # preds = model.predict(X_test)
+    # pred_labels = np.rint(preds)
+    # accuracy = log10(sklearn.metrics.mean_absolute_error(y_test, pred_labels))
+    # pruning_callback = optuna.integration.CatBoostPruningCallback(trial, "validation_0-mae")
+
+    rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats)
+    X_values = X.values
+    y_values = y.values
+    y_pred = np.zeros_like(y_values)
+    for train_index, test_index in rkf.split(X_values):
+        X_A, X_B = X_values[train_index, :], X_values[test_index, :]
+        y_A, y_B = y_values[train_index], y_values[test_index]
+        model.fit(X_A, y_A, eval_set=[(X_B, y_B)],
+            # eval_metric="mae",
+            verbose=0,
+            early_stopping_rounds=early_stopping_rounds,
+        )
+        y_pred[test_index] += model.predict(X_B)
+    y_pred /= n_repeats
+    return log10(mean_absolute_error(y, y_pred))
+
+def train(X, y, model_name, grid_search, save_dir, param=None):
     if grid_search:
-        clf = GridSearchCV(MODELS_GS[model_name], TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
+        clf = GridSearchCV(MODELS_GS[model_name](), TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
         print("Training the model...")
         clf.fit(X, y)
 
@@ -105,8 +141,11 @@ def train(X, y, model_name, grid_search, save_dir):
         return clf
 
     else:
-        model = MODELS[model_name]
-        print("Training the model...")
+        if param:
+            model = MODELS_GS[model_name](**param)
+        else:
+            model = MODELS[model_name]
+            print("Training the model...")
 
         if model_name == "gpr":
             X = X.iloc[:5000, :]
@@ -115,7 +154,7 @@ def train(X, y, model_name, grid_search, save_dir):
         model.fit(X, y)
         return model
 
-def predict(X, y, model, grid_search):
+def predict(X, y, model):
     y_pred = model.predict(X)
     lmae = log10(mean_absolute_error(y, y_pred))
     print(f"LMAE loss: {lmae}")
