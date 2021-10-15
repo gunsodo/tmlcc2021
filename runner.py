@@ -40,7 +40,7 @@ MODELS = {
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
     'cat': CatBoostRegressor(verbose=2),
-    'nn': NeuralNetwork(),
+    # 'nn': NeuralNetwork(),
 }
 
 TUNED_PARAMS = {
@@ -89,28 +89,40 @@ GROW_POLICY = 'Depthwise'
 
 def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_stopping_rounds=10):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    params = {
-        "objective": "MAE",
-        "n_estimators": N_ESTIMATORS, 
-        "depth": trial.suggest_int("max_depth", 8, 16),
-        "learning_rate": trial.suggest_loguniform("learning_rate", 0.005, 0.01),
-        "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.5, 5),
-        "min_child_samples": trial.suggest_loguniform("min_child_samples", 1, 32),
-        "grow_policy": GROW_POLICY,
-        "use_best_model": True,
-        "eval_metric": "MAE",
-        "od_type": 'iter',
-        "od_wait": 20,
-    }
+    if model_name == 'cat':
+        param = {
+            "objective": "MAE",
+            "n_estimators": N_ESTIMATORS, 
+            "depth": trial.suggest_int("max_depth", 8, 16),
+            "learning_rate": trial.suggest_loguniform("learning_rate", 0.005, 0.01),
+            "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.5, 5),
+            "min_child_samples": trial.suggest_loguniform("min_child_samples", 1, 32),
+            "grow_policy": GROW_POLICY,
+            "use_best_model": True,
+            "eval_metric": "MAE",
+            "od_type": 'iter',
+            "od_wait": 20,
+        }
+    elif model_name == 'lgb':
+        param = {
+            "objective": "MAE",
+            "metric": "MAE",
+            "n_estimators": N_ESTIMATORS, 
+            "verbosity": -1,
+            "boosting_type": "gbdt",                
+            "seed": 42,
+            'lambda_l1': trial.suggest_loguniform('lambda_l1', 1e-8, 10.0),
+            'lambda_l2': trial.suggest_loguniform('lambda_l2', 1e-8, 10.0),
+            'num_leaves': trial.suggest_int('num_leaves', 2, 512),
+            'feature_fraction': trial.suggest_uniform('feature_fraction', 0.1, 1.0),
+            'bagging_fraction': trial.suggest_uniform('bagging_fraction', 0.1, 1.0),
+            'bagging_freq': trial.suggest_int('bagging_freq', 0, 15),
+            'min_child_samples': trial.suggest_int('min_child_samples', 1, 32),
+        }
+    else:
+        raise KeyError(f"{model_name} does not Optuna support yet.")
 
-    model = MODELS_GS[model_name](**params)
-
-    # model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=0, early_stopping_rounds=100)
-
-    # preds = model.predict(X_test)
-    # pred_labels = np.rint(preds)
-    # accuracy = log10(sklearn.metrics.mean_absolute_error(y_test, pred_labels))
-    # pruning_callback = optuna.integration.CatBoostPruningCallback(trial, "validation_0-mae")
+    model = MODELS_GS[model_name](**param)
 
     rkf = RepeatedKFold(n_splits=n_splits, n_repeats=n_repeats)
     X_values = X.values
@@ -119,17 +131,23 @@ def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_
     for train_index, test_index in rkf.split(X_values):
         X_A, X_B = X_values[train_index, :], X_values[test_index, :]
         y_A, y_B = y_values[train_index], y_values[test_index]
-        model.fit(X_A, y_A, eval_set=[(X_B, y_B)],
-            # eval_metric="mae",
-            verbose=0,
-            early_stopping_rounds=early_stopping_rounds,
-        )
+        if model_name == 'cat':
+            model.fit(X_A, y_A, eval_set=[(X_B, y_B)],
+                # eval_metric="mae",
+                verbose=0,
+                early_stopping_rounds=early_stopping_rounds,
+            )
+        elif model_name == 'lgb':
+            model.fit(X_A, y_A, eval_set=[(X_B, y_B)], early_stopping_rounds=early_stopping_rounds, eval_metric="mae")
         y_pred[test_index] += model.predict(X_B)
     y_pred /= n_repeats
     return log10(mean_absolute_error(y, y_pred))
 
 def train(X, y, model_name, grid_search, save_dir, param=None):
     if grid_search:
+        if model_name not in MODELS_GS:
+            raise KeyError(f"{model_name} does not have GridSearchCV support yet.")
+        
         clf = GridSearchCV(MODELS_GS[model_name](), TUNED_PARAMS[model_name], verbose=10, cv=3, n_jobs=2)
         print("Training the model...")
         clf.fit(X, y)
@@ -145,8 +163,14 @@ def train(X, y, model_name, grid_search, save_dir, param=None):
 
     else:
         if param:
-            param["n_estimators"] = N_ESTIMATORS
-            param["grow_policy"] = GROW_POLICY
+            if model_name == 'cat':
+                param["n_estimators"] = N_ESTIMATORS
+                param["grow_policy"] = GROW_POLICY
+            elif model_name == 'lgb':
+                param["n_estimators"] = N_ESTIMATORS
+            else:
+                continue
+
             model = MODELS_GS[model_name](**param)
             print("Training model with the best parameter...")
         else:
