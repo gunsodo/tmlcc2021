@@ -169,7 +169,7 @@ def train(X, y, model_name, grid_search, save_dir, param=None):
             elif model_name == 'lgb':
                 param["n_estimators"] = N_ESTIMATORS
             else:
-                continue
+                pass
 
             model = MODELS_GS[model_name](**param)
             print("Training model with the best parameter...")
