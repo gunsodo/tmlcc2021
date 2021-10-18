@@ -118,6 +118,21 @@ def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_
             'bagging_freq': trial.suggest_int('bagging_freq', 0, 15),
             'min_child_samples': trial.suggest_int('min_child_samples', 1, 32),
         }
+    elif model_name == 'xgb':
+        params = {
+            "verbosity": 0,
+            "n_estimators": N_ESTIMATORS, 
+            "max_depth": trial.suggest_int("max_depth", 4, 20),
+            "learning_rate": trial.suggest_loguniform("learning_rate", 0.001, 0.01),
+            "colsample_bytree": trial.suggest_loguniform("colsample_bytree", 0.2, 1),
+            "colsample_bylevel": trial.suggest_loguniform("colsample_bylevel", 0.2, 1),
+            "colsample_bynode": trial.suggest_loguniform("colsample_bynode", 0.2, 1),
+            "subsample": trial.suggest_loguniform("subsample", 0.4, 1.0),
+            "alpha": trial.suggest_loguniform("alpha", 1e-4, 10.0),
+            "lambda": trial.suggest_loguniform("lambda", 1e-8, 10.0),
+            "gamma": trial.suggest_loguniform("gamma", 1e-8, 10.0),
+            "min_child_weight": trial.suggest_loguniform("min_child_weight", 1, 1000),
+        }
     else:
         raise KeyError(f"{model_name} does not Optuna support yet.")
 
