@@ -1,6 +1,10 @@
 # Representation
 ## cifAdapter
-convert .cif files to pandas dataframe
+cifAdapter.py convert .cif files to pandas dataframe:
+'''
+from cifAdapter import CIF2PandasAdapter
+mof = CIF2PandasAdapter().apply(filename) # pandas dataframe
+'''
 
 ## Atomic Property-weighted Radial Distribution Function (AP-RDF)
 add the desired property to atomic_property_dict.py. modify line 20-49 to parameters of choice in APRDF.py and run APRDF.py to generate a descriptor csv file.
