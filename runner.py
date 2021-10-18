@@ -10,9 +10,8 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.gaussian_process.kernels import RBF, DotProduct
 from math import log10
 import numpy as np
-import optuna
 
-# from models.nn import NeuralNetwork
+from models.nn import NeuralNetwork
 
 MODELS_GS = {
     'svr': SVR,
@@ -40,7 +39,7 @@ MODELS = {
     'xgb': XGBRegressor(verbosity=2),
     'lgb': LGBMRegressor(verbose=2),
     'cat': CatBoostRegressor(verbose=2),
-    # 'nn': NeuralNetwork(),
+    'nn': NeuralNetwork(),
 }
 
 TUNED_PARAMS = {
@@ -88,7 +87,7 @@ N_ESTIMATORS = 1000
 GROW_POLICY = 'Depthwise'
 
 def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_stopping_rounds=10):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    ## Add your model here
     if model_name == 'cat':
         param = {
             "objective": "MAE",
@@ -131,14 +130,16 @@ def objective(trial, X, y, model_name, n_splits=5, n_repeats=1, n_jobs=2, early_
     for train_index, test_index in rkf.split(X_values):
         X_A, X_B = X_values[train_index, :], X_values[test_index, :]
         y_A, y_B = y_values[train_index], y_values[test_index]
+
+        ## Add your model here
         if model_name == 'cat':
             model.fit(X_A, y_A, eval_set=[(X_B, y_B)],
-                # eval_metric="mae",
                 verbose=0,
                 early_stopping_rounds=early_stopping_rounds,
             )
         elif model_name == 'lgb':
             model.fit(X_A, y_A, eval_set=[(X_B, y_B)], early_stopping_rounds=early_stopping_rounds, eval_metric="mae")
+
         y_pred[test_index] += model.predict(X_B)
     y_pred /= n_repeats
     return log10(mean_absolute_error(y, y_pred))

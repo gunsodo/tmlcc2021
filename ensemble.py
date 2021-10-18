@@ -1,12 +1,8 @@
 import argparse
-import joblib
 import os
 import pandas as pd
 import numpy as np
 from uuid import uuid4
-
-from representation.pipeline import load_representation
-from runner import predict
 
 parser = argparse.ArgumentParser("Ensemble Prediciton")
 
