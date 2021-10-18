@@ -3,3 +3,4 @@ lightgbm
 catboost
 tensorflow
 optuna
+reacnet
