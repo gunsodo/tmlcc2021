@@ -55,7 +55,7 @@ python opt.py -r preprocessed linearAP-RDF -m cat -d results -n 10
 
 ![Heatmap](img/heatmap.png)
 
-Read more at devpost, [click here](#).
+Read more at devpost, [click here](https://devpost.com/software/project-6mw3fgs9j7uo).
 
 ## Customization
 
