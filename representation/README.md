@@ -1,5 +1,5 @@
 # Representation
-## cifAdapter
+## .cif file Adapter
 cifAdapter.py convert .cif files to pandas dataframe:
 ```
 from cifAdapter import CIF2PandasAdapter
@@ -13,4 +13,7 @@ add the desired property to atomic_property_dict.py. modify line 20-49 to parame
 edit directory on line 16 of gen-bag-of-atoms.py and bag-of-atoms.py. Running bag-of-atoms.py will generate a csv file containing the 216 epsilon and 216 sigma "bags" with their corresponding atoms. Then, run gen-bag-of-atoms to generate a descriptor csv file.
 
 ## Chemical Motif Density
-edit motif_dict on line 12 and run the code to generate a descriptor csv file.
+edit motif_dict on line 12 of chemical_motif.py and run the code to generate a descriptor csv file.
+
+## smile converter
+edit `src` on line 10 of convert_smi.py to the .cif folder to generate smile data as a csv file.
