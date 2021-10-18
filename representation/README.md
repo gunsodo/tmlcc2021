@@ -1,4 +1,6 @@
 # Representation
+In order to use these files, you may have to install some other dependencies. We do not create a separate `requirements.txt` file because it may use up your storage. Please install any necessary library on your preferences.
+
 ## .cif file Adapter
 cifAdapter.py convert .cif files to pandas dataframe:
 ```
