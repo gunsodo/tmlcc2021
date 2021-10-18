@@ -80,5 +80,3 @@ def clean(filename='train.csv', method=['rm', 'mean', 'median'], remove_MOFname=
             print(savename + '.csv is saved')
 
     # TODO add more method
-
-clean(method=['nan'])
