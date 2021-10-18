@@ -37,5 +37,5 @@ for i in range(8):
 
         LMAE_map[rep1][j] = lmae
 
-LMAE_map.to_csv('/work/Export/LMAE_'+str(model)+'.csv',index=False)
+LMAE_map.to_csv('/Export/LMAE_'+str(model)+'.csv',index=False)
         
