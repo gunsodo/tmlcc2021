@@ -10,7 +10,7 @@ dst = 'pretest.csv' # csv destination
 
 # calculate motif
 motif_dict = {'Br': {0:('C')},
-              'C': {1:('F','F','F','C'), 2:('H','H','H','C'), 3:('N','C'), 4:('C','C','C'), 5:('C','O','O')},
+              'C': {1:('F','F','F','C'), 2:('H','H','H','C'), 3:('N','C'), 4:('C','C','C'), 5:('C','O','O'), 18:('I','C','C','C'), 20:('C','C','C','C'), 21:},
               'F': {6:('C')},
               'H': {7:('C')},
               'N': {8:('H','H','C'), 9:('O','O','C'), 10:{'C','C'}},
@@ -20,6 +20,8 @@ motif_dict = {'Br': {0:('C')},
               'Cr': 14,
               'Zn': 15,
               'Zr': 16,
+              'V': 17,
+              'I': {19:('C')},
             }
 def nn(string):
     return re.sub('[^a-zA-Z]','', string)
@@ -73,6 +75,7 @@ def motif(G, motif_dict, volume):
 if __name__ == "__main__":
     df = []
     for filename in os.listdir(src):
+        print(filename)
         adapter = CIF2PandasAdapter()
         output = adapter.apply(src + '/' + filename)
         G = nx.Graph()
